@@ -69,20 +69,17 @@ export default {
     };
   },
   mounted() {
-      this.init()
+    this.init()
   },
   methods: {
-      init() {
-          console.log(d3) // This can be savely removed
-          // This will be called when the page loads.
-          // You can load your data and setup D3 here
+    init() {
         this.x = d3.scaleLinear()
         this.y = d3.scaleSqrt()
         this.color = d3.scaleOrdinal()
 
         this.update()
       },
-      update() {
+    update() {
         this.x.domain([d3.min(this.dataset, d => d.age ) , d3.max(this.dataset, d => d.age)])
             .range([this.margin.left, this.width + this.margin.right])
         this.y.domain(d3.extent(this.dataset, d => d.age1stCode))
@@ -108,7 +105,7 @@ export default {
 
       const s = d3.scaleLinear()
           .domain([d3.min(this.dataset.map(d => d.yearsCode)), d3.max(this.dataset.map(d => d.yearsCode))])
-          .range([1, 8]);
+          .range([1, 6]);
 
       svg.selectAll("circle")
           .data(this.dataset)
@@ -117,6 +114,11 @@ export default {
           .attr("r", (d) => s(d.yearsCode ?? 0) )
           .attr("fill-opacity", "0.6")
           .attr('fill', (d) => this.color(d.edLevel))
+
+      const brush = d3.brush()
+          .on("start brush end", this.brushed)
+          .on("end", this.brushedEnd)
+      svg.call(brush);
     },
     renderXAxis() {
       let xAxis = d3.axisBottom(this.x).ticks(this.width / 80)

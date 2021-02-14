@@ -1,44 +1,68 @@
 <!-- This file will be used to layout and connect your views -->
 <template>
   <div id="app">
-      <!-- This is only a basic setup to display your views. Use HTML and CSS to create your layout using these basic commands -->
-    <ScatterPlot
-        class="scatter-plot"
+    <!-- This is only a basic setup to display your views. Use HTML and CSS to create your layout using these basic commands -->
+    <!--    <ScatterPlot-->
+    <!--        class="scatter-plot"-->
+    <!--        v-if="dataset"-->
+    <!--        chartId="SO-survey1"-->
+    <!--        title="Scatter Plot"-->
+    <!--        :dataset="dataset"-->
+    <!--        attribX="age"-->
+    <!--        labelX="Age"-->
+    <!--        attribY="age1stCode"-->
+    <!--        labelY="Age First Code"-->
+    <!--        :width="900"-->
+    <!--        :height="800"/>-->
+    <!--      <WorldMap-->
+    <!--          class="world-map"-->
+    <!--          v-if="dataset"-->
+    <!--          chartId="SO-survey2"-->
+    <!--          title="World Map"-->
+    <!--          :dataset="dataset"-->
+    <!--          :width="900"-->
+    <!--          :height="800"-->
+    <!--          :world="world"-->
+    <!--      />-->
+    <PieChart
+        class="pie-chart"
         v-if="dataset"
-        chartId="SO-survey1"
-        title="Scatter Plot"
+        chartId="SO-survey3"
+        title="Pie Chart"
         :dataset="dataset"
-        attribX="age"
-        labelX="Age"
-        attribY="age1stCode"
-        labelY="Age First Code"
-        :width="900"
-        :height="800"/>
-      <View2 />
-      <View3 />
+        :width="400"
+        :height="400"
+        data1-attr="betterLife"
+        data2-attr="UnitTest"
+    />
   </div>
 </template>
 
 <script>
 // Try to use descriptive names like 'OverviewScatterPlot' or 'DetailLineChart'
-import ScatterPlot from './components/ScatterPlot.vue'
-import View2 from './components/View2.vue'
-import View3 from './components/View3.vue'
+// import ScatterPlot from './components/ScatterPlot.vue'
+// import WorldMap from "@/components/WorldMap";
+import PieChart from './components/PieChart.vue'
 import * as d3 from "d3";
+
 
 export default {
   name: 'App',
   components: {
-    ScatterPlot,
-    View2,
-    View3
+    // WorldMap,
+    // ScatterPlot,
+    PieChart
   },
   data() {
     return {
-      dataset: null
+      dataset: null,
+      world: null,
     }
   },
-  created(){
+  created() {
+    d3.json("/data/countries-50m.json", d3.autoType).then((data) => {
+      this.world = data
+    })
     d3.csv("/data/survey_results_public.csv", d3.autoType).then((data) => {
 
       this.dataset = d3.map(data, (d) => {
@@ -48,61 +72,84 @@ export default {
           age1stCode: this.parseAge1stCode(d["Age1stCode"]),
           yearsCode: this.parseYearsCode(d["YearsCode"]),
           age: this.parseAge(d["Age"]),
-          edLevel: this.parseEdLevel(d["EdLevel"])
+          edLevel: this.parseEdLevel(d["EdLevel"]),
+          country: this.parseCountry(d["Country"]),
+          workHour: this.parseWorkHour(d["WorkWeekHrs"]),
+          betterLife: d["BetterLife"],
+          itPerson: this.parseITPerson(d["ITperson"])
         }
       }).filter(d => d.age > 0 && d.age1stCode > 0 && d.yearsCode > 0)
     });
   },
   methods: {
-    parseAge(age){
-      age = String(age)
-      if (age.indexOf("NA") >= 0){
-        return -1
+    parseITPerson(itPerson) {
+      if (itPerson === "Also Yes") {
+        return "Yes"
+      } else if (itPerson === "Fortunately, someone else has that title") {
+        return "No"
+      } else {
+        return itPerson
       }
-      else{
+    },
+    parseAge(age) {
+      age = String(age)
+      if (age.indexOf("NA") >= 0) {
+        return -1
+      } else {
         return parseInt(age)
       }
     },
-    parseYearsCode(yearsCode){
+    parseYearsCode(yearsCode) {
       yearsCode = String(yearsCode)
-      if (yearsCode.indexOf("Less than") >= 0){
+      if (yearsCode.indexOf("Less than") >= 0) {
         return 0.5
-      }
-      else if (yearsCode.indexOf("More than") >= 0){
+      } else if (yearsCode.indexOf("More than") >= 0) {
         return 51
-      }
-      else if (yearsCode.indexOf("NA") >= 0){
+      } else if (yearsCode.indexOf("NA") >= 0) {
         return -1
-      }
-      else {
+      } else {
         return parseInt(yearsCode)
       }
 
     },
-    parseAge1stCode(age1stCode){
+    parseAge1stCode(age1stCode) {
       age1stCode = String(age1stCode)
-      if (age1stCode.indexOf("Younger") >= 0){
+      if (age1stCode.indexOf("Younger") >= 0) {
         return 4
-      }
-      else if (age1stCode.indexOf("Older") >= 0){
+      } else if (age1stCode.indexOf("Older") >= 0) {
         return 86
-      }
-      else if (age1stCode.indexOf("NA") >= 0){
+      } else if (age1stCode.indexOf("NA") >= 0) {
         return -1
-      }
-      else {
+      } else {
         return parseInt(age1stCode)
       }
     },
-    parseEdLevel(edLevel){
+    parseEdLevel(edLevel) {
       const responseArr = ['Primary', 'Secondary', 'Associated', 'Bachelor', 'Master', 'Professional', 'doctoral']
-      for(let i = 0; i < responseArr.length; i++){
+      for (let i = 0; i < responseArr.length; i++) {
         let index = edLevel.indexOf(responseArr[i])
         if (index >= 0) {
           return responseArr[i].charAt(0).toUpperCase() + responseArr[i].slice(1)
         }
       }
       return "Other"
+    },
+    parseCountry(country) {
+      if (country === "United States") {
+        return "United States of America"
+      } else if (country === "Russian Federation") {
+        return "Russia"
+      } else if (country === "Antigua and Barbuda") {
+        return "Antigua and Barb."
+      }
+      return country
+    },
+    parseWorkHour(workHour) {
+      if (workHour === 'NA') {
+        return -1
+      } else {
+        return parseInt(workHour)
+      }
     }
   }
 
