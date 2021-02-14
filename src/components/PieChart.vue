@@ -2,8 +2,8 @@
 <template>
   <div>
     <h1>{{ title }}</h1>
-    <button v-on:click="update1">Better life?</button>
-    <button v-on:click="update2">IT Person?</button>
+    <button v-on:click="state = 1">Better life?</button>
+    <button v-on:click="state = 2">IT Person?</button>
     <svg :class="`pie-chart-svg-${chartId}`" :viewBox="viewBox">
       <g :transform="`translate(${margin.left}, ${margin.top})`">
         <g class="plot"></g>
@@ -39,18 +39,11 @@ export default {
       required: true,
       type: Number,
     },
-    data1Attr: {
-      required: true,
-      type: String
-    },
-    data2Attr: {
-      required: true,
-      type: String
-    },
   },
   data() {
     return {
       radius: null,
+      state: 1,
       data1: null,
       data2: null,
       x: null,
@@ -67,24 +60,27 @@ export default {
   mounted() {
     this.init()
   },
+  watch: {
+    dataset() {
+      this.prepareData()
+      this.update();
+    },
+    state() {
+      this.update()
+    }
+  },
   methods: {
     init() {
       this.color = d3.scaleOrdinal()
       this.radius = Math.min(this.width, this.height) / 2 - 1.5 * this.margin.left
       this.prepareData()
-      this.update(this.data1)
+      this.update()
     },
-    update(data) {
+    update() {
       this.color.domain(['Yes', 'No', 'Sigh'])
           .range(["#84a1fa", "#f86b6b", "#9c6bf8"]);
 
-      this.renderPieChart(data)
-    },
-    update1() {
-      this.update(this.data1)
-    },
-    update2() {
-      this.update(this.data2)
+      this.renderPieChart()
     },
     prepareData() {
       let betterLifeYesCount = 0
@@ -116,7 +112,14 @@ export default {
         value: itPersonSighCount
       }]
     },
-    renderPieChart(data) {
+    renderPieChart() {
+      let data = null
+      if (this.state === 1) {
+        data = this.data1
+      } else {
+        data = this.data2
+      }
+
       const arc = d3.arc().innerRadius(this.radius * 0.67).outerRadius(this.radius - 1);
 
       const pie = d3.pie()

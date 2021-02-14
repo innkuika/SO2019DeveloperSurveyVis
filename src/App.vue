@@ -2,34 +2,36 @@
 <template>
   <div id="app">
     <!-- This is only a basic setup to display your views. Use HTML and CSS to create your layout using these basic commands -->
-    <!--    <ScatterPlot-->
-    <!--        class="scatter-plot"-->
-    <!--        v-if="dataset"-->
-    <!--        chartId="SO-survey1"-->
-    <!--        title="Scatter Plot"-->
-    <!--        :dataset="dataset"-->
-    <!--        attribX="age"-->
-    <!--        labelX="Age"-->
-    <!--        attribY="age1stCode"-->
-    <!--        labelY="Age First Code"-->
-    <!--        :width="900"-->
-    <!--        :height="800"/>-->
-    <!--      <WorldMap-->
-    <!--          class="world-map"-->
-    <!--          v-if="dataset"-->
-    <!--          chartId="SO-survey2"-->
-    <!--          title="World Map"-->
-    <!--          :dataset="dataset"-->
-    <!--          :width="900"-->
-    <!--          :height="800"-->
-    <!--          :world="world"-->
-    <!--      />-->
+    <ScatterPlot
+        class="scatter-plot"
+        v-if="dataset"
+        chartId="SO-survey1"
+        title="Scatter Plot"
+        :dataset="dataset"
+        attribX="age"
+        labelX="Age"
+        attribY="age1stCode"
+        labelY="Age First Code"
+        :width="900"
+        :height="800"
+        @item-selected="circleSelected"
+    />
+    <WorldMap
+        class="world-map"
+        v-if="selectedData"
+        chartId="SO-survey2"
+        title="World Map"
+        :dataset="selectedData"
+        :width="900"
+        :height="800"
+        :world="world"
+    />
     <PieChart
         class="pie-chart"
-        v-if="dataset"
+        v-if="selectedData"
         chartId="SO-survey3"
         title="Pie Chart"
-        :dataset="dataset"
+        :dataset="selectedData"
         :width="400"
         :height="400"
         data1-attr="betterLife"
@@ -40,8 +42,8 @@
 
 <script>
 // Try to use descriptive names like 'OverviewScatterPlot' or 'DetailLineChart'
-// import ScatterPlot from './components/ScatterPlot.vue'
-// import WorldMap from "@/components/WorldMap";
+import ScatterPlot from './components/ScatterPlot.vue'
+import WorldMap from "@/components/WorldMap";
 import PieChart from './components/PieChart.vue'
 import * as d3 from "d3";
 
@@ -49,14 +51,15 @@ import * as d3 from "d3";
 export default {
   name: 'App',
   components: {
-    // WorldMap,
-    // ScatterPlot,
+    WorldMap,
+    ScatterPlot,
     PieChart
   },
   data() {
     return {
       dataset: null,
       world: null,
+      selectedData: null
     }
   },
   created() {
@@ -64,9 +67,7 @@ export default {
       this.world = data
     })
     d3.csv("/data/survey_results_public.csv", d3.autoType).then((data) => {
-
       this.dataset = d3.map(data, (d) => {
-
         return {
           id: d["Respondent"],
           age1stCode: this.parseAge1stCode(d["Age1stCode"]),
@@ -78,10 +79,16 @@ export default {
           betterLife: d["BetterLife"],
           itPerson: this.parseITPerson(d["ITperson"])
         }
-      }).filter(d => d.age > 0 && d.age1stCode > 0 && d.yearsCode > 0)
+      }).filter((d, i) => i % 20 === 0 && d.age > 0 && d.age1stCode > 0 && d.yearsCode > 0)
     });
   },
   methods: {
+    circleSelected(selection) {
+      if (selection === null) {
+        selection = this.dataset
+      }
+      this.selectedData = selection
+    },
     parseITPerson(itPerson) {
       if (itPerson === "Also Yes") {
         return "Yes"

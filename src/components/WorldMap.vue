@@ -61,14 +61,19 @@ export default {
   mounted() {
     this.init()
   },
+  watch: {
+    dataset() {
+      this.update()
+    }
+  },
   methods: {
     init() {
       this.country = topojson.feature(this.world, this.world.objects.countries)
       this.color = d3.scaleSequential()
-      this.parseDataset()
       this.update()
     },
     update() {
+      this.parseDataset()
       this.color
           .domain(d3.extent(Object.values(this.data)))
           .interpolator(d3.interpolateYlGnBu)

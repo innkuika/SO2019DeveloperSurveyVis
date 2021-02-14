@@ -76,7 +76,7 @@ export default {
         this.x = d3.scaleLinear()
         this.y = d3.scaleSqrt()
         this.color = d3.scaleOrdinal()
-
+        this.$emit('item-selected', null)
         this.update()
       },
     update() {
@@ -119,6 +119,55 @@ export default {
           .on("start brush end", this.brushed)
           .on("end", this.brushedEnd)
       svg.call(brush);
+    },
+    brushedEnd({selection}) {
+      let dot = d3.select(`.scatterplot-svg-${this.chartId}`)
+          .select(".plot")
+          .selectAll("circle")
+      let value = [];
+      if (selection) {
+        const [[x0, y0], [x1, y1]] = selection;
+        value = dot
+            .attr("fill", "gray")
+            //.filter(d => ((this.filterOption === "P" || "F" || "p" || "f" ) && (d.passOrFail === this.filterOption)) || (this.filterOption === "A"))
+            .filter(d => x0 <= this.x(d[this.attribX]) && this.x(d[this.attribX]) < x1 && y0 <= this.y(d[this.attribY]) && this.y(d[this.attribY]) < y1)
+            .attr('fill', (d) => this.color(d.edLevel))
+            .data();
+      } else {
+        dot.attr('fill', (d) => this.color(d.edLevel));
+      }
+      d3.select(`.scatterplot-svg-${this.chartId}`)
+          .property("value", value).dispatch("input");
+
+      if (value.length === 0){
+        this.$emit('item-selected', null)
+      }
+      else{
+        this.$emit('item-selected', value)
+      }
+
+
+    },
+    brushed({selection}){
+      let dot = d3.select(`.scatterplot-svg-${this.chartId}`)
+          .select(".plot")
+          .selectAll("circle")
+      let value = [];
+      if (selection) {
+        const [[x0, y0], [x1, y1]] = selection;
+        value = dot
+            .attr("fill", "gray") // Color everything grey
+            // filter out the circles you want to color
+            // .filter(d => ((this.filterOption === "P" || "F" || "p" || "f" ) && (d.passOrFail === this.filterOption)) || (this.filterOption === "A"))
+            .filter(d => x0 <= this.x(d[this.attribX]) && this.x(d[this.attribX]) < x1 && y0 <= this.y(d[this.attribY]) && this.y(d[this.attribY]) < y1)
+            // color them
+            .attr('fill', (d) => this.color(d.edLevel)) //
+            .data();
+      } else {
+        dot.attr('fill', (d) => this.color(d.edLevel));
+      }
+      d3.select(`.scatterplot-svg-${this.chartId}`)
+          .property("value", value).dispatch("input");
     },
     renderXAxis() {
       let xAxis = d3.axisBottom(this.x).ticks(this.width / 80)
