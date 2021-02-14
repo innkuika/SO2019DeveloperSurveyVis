@@ -111,8 +111,13 @@ export default {
       const outline = ({type: "Sphere"})
       const path = d3.geoPath(projection)
 
-      var svg = d3.select(`.world-map-svg-${this.chartId}`)
+      const svg = d3.select(`.world-map-svg-${this.chartId}`)
           .select(".plot")
+
+      const tooltipDiv = d3.select("body").append("div")
+          .attr("class", "tooltip")
+          .style("opacity", 0);
+
 
       const defs = svg.append("defs");
 
@@ -138,9 +143,23 @@ export default {
           .data(this.country.features)
           .join("path")
           .attr("fill", d => {
-            return this.color(this.data[d.properties.name])})
+            return this.color(this.data[d.properties.name])
+          })
           .attr("d", path)
-          .append("title")
+          .on("mouseover", (event, d) => {
+            tooltipDiv.transition()
+                .duration(200)
+                .style("opacity", .9);
+            tooltipDiv.html(d.properties.name + " " + Math.round(this.data[d.properties.name]))
+                .style("left", (event.pageX) + "px")
+                .style("top", (event.pageY - 28) + "px");
+          })
+          .on("mouseout", function () {
+            tooltipDiv.transition()
+                .duration(500)
+                .style("opacity", 0);
+          })
+
 
       g.append("path")
           .datum(topojson.mesh(this.world, this.world.objects.countries, (a, b) => a !== b))
@@ -148,6 +167,7 @@ export default {
           .attr("stroke", "white")
           .attr("stroke-linejoin", "round")
           .attr("d", path);
+
 
       return svg.node();
     }
@@ -164,4 +184,16 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
 /* Add your CSS here */
+div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 80px;
+  height: 28px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+}
 </style>
