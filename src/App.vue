@@ -1,12 +1,11 @@
 <!-- This file will be used to layout and connect your views -->
 <template>
   <div id="app">
-    <!-- This is only a basic setup to display your views. Use HTML and CSS to create your layout using these basic commands -->
     <ScatterPlot
         class="scatter-plot"
         v-if="dataset"
         chartId="SO-survey1"
-        title="Scatter Plot"
+        title="Did People All Quit School?"
         :dataset="dataset"
         attribX="age"
         labelX="Age"
@@ -20,22 +19,20 @@
         class="world-map"
         v-if="selectedData"
         chartId="SO-survey2"
-        title="World Map"
+        title="How Much Time Do People Spend On Working?"
         :dataset="selectedData"
         :width="900"
-        :height="800"
+        :height="400"
         :world="world"
     />
     <PieChart
         class="pie-chart"
         v-if="selectedData"
         chartId="SO-survey3"
-        title="Pie Chart"
+        title="See What's In People's Mind"
         :dataset="selectedData"
         :width="400"
-        :height="400"
-        data1-attr="betterLife"
-        data2-attr="UnitTest"
+        :height="250"
     />
   </div>
 </template>
@@ -79,7 +76,7 @@ export default {
           betterLife: d["BetterLife"],
           itPerson: this.parseITPerson(d["ITperson"])
         }
-      }).filter((d, i) => i % 20 === 0 && d.age > 0 && d.age1stCode > 0 && d.yearsCode > 0)
+      }).filter((d, i) => i % 10 === 0 && d.age > 0 && d.age1stCode > 0 && d.yearsCode > 0 && d.age > d.age1stCode && d.age < 80)
     });
   },
   methods: {
@@ -164,6 +161,8 @@ export default {
 </script>
 
 <style>
+body {background-color: whitesmoke;}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -171,5 +170,22 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+  display: grid;
+  grid-template-rows: 50vh 40vh;
+  grid-template-columns: 1fr 10fr 10fr 1fr;
+  grid-template-areas:
+    ". overview detail1 ."
+    ". overview detail2 .";
+}
+
+.scatter-plot {
+  grid-area: overview;
+}
+
+.world-map {
+  grid-area: detail1;
+}
+.pie-chart {
+  grid-area: detail2;
 }
 </style>

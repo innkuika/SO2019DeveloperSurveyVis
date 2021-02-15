@@ -2,15 +2,22 @@
 <template>
   <div>
     <h1>{{title}}</h1>
-    <svg class="legends" height=40 width=450></svg>
+    <svg class="legends" height=45 width=600></svg>
     <svg :class="`scatterplot-svg-${chartId}`" :viewBox="viewBox">
-      <g :transform="`translate(${margin.left}, ${margin.top})`">
+      <g class="main-plot" :transform="`translate(${margin.left}, ${margin.top})`">
         <g class="plot"></g>
         <g class="x-axis" :transform="`translate(0, ${height})`"></g>
         <g class="y-axis" :transform="`translate(${margin.left}, 0)`"></g>
       </g>
-
     </svg>
+    <h3>
+      Dataset: Stack Overflow 2019 Developer Survey
+    </h3>
+    <p>
+      [1] Bachelor or equivalent degree <br>
+      [2] Master, Professional or Doctoral Degree <br>
+      [3] No Degree or not applicable
+    </p>
   </div>
 </template>
 
@@ -89,23 +96,41 @@ export default {
                            'Master', 'Professional',
                            'Doctoral',
                            'Other'])
-            .range(["#56ddff", "#2cb3fc",
-                    "#0a80ff", "#1049de",
-                    "#a15fff", "#7e59ff",
-                    "#8200ff",
-                    "#454343"]);
+            .range(["#56ddff", "#56ddff",
+                    "#0a80ff", "#0a80ff",
+                    "#a15fff", "#a15fff",
+                    "#a15fff",
+                    "#ffc38b"]);
 
         this.renderScatter();
         this.renderXAxis();
         this.renderYAxis();
+        this.renderLegend()
       },
+    renderLegend() {
+      var svg = d3.select(`.legends`)
+      // Handmade legend
+      svg.append("circle").attr("cx",6).attr("cy",10).attr("r", 6).style("fill", "#56ddff")
+      svg.append("circle").attr("cx",230).attr("cy",10).attr("r", 6).style("fill", "#0a80ff")
+      svg.append("circle").attr("cx",350).attr("cy",10).attr("r", 6).style("fill", "#a15fff")
+      svg.append("circle").attr("cx",470).attr("cy",10).attr("r", 6).style("fill", "#ffc38b")
+      svg.append("text").attr("x", 15).attr("y", 10).text("Elementary & Secondary").style("font-size", "15px").attr("alignment-baseline","middle")
+      svg.append("text").attr("x", 239).attr("y", 10).text("Bachelor*").style("font-size", "15px").attr("alignment-baseline","middle")
+      svg.append("text").attr("x", 359).attr("y", 10).text("Graduated*").style("font-size", "15px").attr("alignment-baseline","middle")
+      svg.append("text").attr("x", 479).attr("y", 10).text("No Degree*").style("font-size", "15px").attr("alignment-baseline","middle")
+
+      svg.append("circle").attr("cx",6).attr("cy",30).attr("r", 2).style("fill", "grey")
+      svg.append("circle").attr("cx",200).attr("cy",30).attr("r", 12).style("fill", "grey")
+      svg.append("text").attr("x", 15).attr("y", 30).text(`Coded for less than year`).style("font-size", "15px").attr("alignment-baseline","middle")
+      svg.append("text").attr("x", 222).attr("y", 30).text(`Coded for ${d3.max(this.dataset.map(d => d.yearsCode))}  years`).style("font-size", "15px").attr("alignment-baseline","middle")
+    },
     renderScatter(){
       var svg = d3.select(`.scatterplot-svg-${this.chartId}`)
           .select(".plot")
 
       const s = d3.scaleLinear()
           .domain([d3.min(this.dataset.map(d => d.yearsCode)), d3.max(this.dataset.map(d => d.yearsCode))])
-          .range([1, 6]);
+          .range([2, 12]);
 
       svg.selectAll("circle")
           .data(this.dataset)
@@ -209,4 +234,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
 /* Add your CSS here */
+.main-plot {
+  background: white;
+}
 </style>

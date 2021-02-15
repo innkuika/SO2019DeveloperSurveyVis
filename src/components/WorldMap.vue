@@ -2,6 +2,7 @@
 <template>
   <div>
     <h1>{{ title }}</h1>
+    <svg class="legends" height=45 width=600></svg>
     <svg :class="`world-map-svg-${chartId}`" :viewBox="viewBox">
       <g :transform="`translate(${margin.left}, ${margin.top})`">
         <g class="plot"></g>
@@ -75,7 +76,8 @@ export default {
     update() {
       this.parseDataset()
       this.color
-          .domain(d3.extent(Object.values(this.data)))
+          //.domain(d3.extent(Object.values(this.data)))
+          .domain([10, 80])
           .interpolator(d3.interpolateYlGnBu)
           .unknown("#ccc")
 
@@ -150,7 +152,7 @@ export default {
             tooltipDiv.transition()
                 .duration(200)
                 .style("opacity", .9);
-            tooltipDiv.html(d.properties.name + " " + Math.round(this.data[d.properties.name]))
+            tooltipDiv.html(d.properties.name + " " + Math.round(this.data[d.properties.name]) + "h")
                 .style("left", (event.pageX) + "px")
                 .style("top", (event.pageY - 28) + "px");
           })
@@ -158,7 +160,7 @@ export default {
             tooltipDiv.transition()
                 .duration(500)
                 .style("opacity", 0);
-          })
+          })``
 
 
       g.append("path")
@@ -184,14 +186,14 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
 /* Add your CSS here */
-div.tooltip {
+.tooltip {
   position: absolute;
   text-align: center;
   width: 80px;
-  height: 28px;
+  height: 40px;
   padding: 2px;
   font: 12px sans-serif;
-  background: lightsteelblue;
+  background: seashell;
   border: 0px;
   border-radius: 8px;
   pointer-events: none;

@@ -1,15 +1,18 @@
 <!-- Your HTML goes here -->
 <template>
-  <div>
-    <h1>{{ title }}</h1>
-    <button v-on:click="state = 1">Better life?</button>
-    <button v-on:click="state = 2">IT Person?</button>
-    <svg :class="`pie-chart-svg-${chartId}`" :viewBox="viewBox">
-      <g :transform="`translate(${margin.left}, ${margin.top})`">
-        <g class="plot"></g>
-      </g>
-
-    </svg>
+  <div class="container">
+    <div class="title">
+      <h1 >{{ title }}</h1>
+    </div>
+    <button class="button1 button" v-on:click="state = 1">Do people today have a better life?</button>
+    <button class="button2" v-on:click="state = 2">Are you the IT Person?</button>
+    <div class="pie-chart-main">
+      <svg :class="`pie-chart-svg-${chartId}`" :viewBox="viewBox">
+        <g :transform="`translate(${margin.left}, ${margin.top})`">
+          <g class="plot"></g>
+        </g>
+      </svg>
+    </div>
   </div>
 </template>
 
@@ -50,9 +53,9 @@ export default {
       y: null,
       color: null,
       margin: {
-        left: 100,
-        top: 50,
-        right: 20,
+        left: 10,
+        top: -30,
+        right: -10,
         bottom: 75,
       }
     };
@@ -120,7 +123,7 @@ export default {
         data = this.data2
       }
 
-      const arc = d3.arc().innerRadius(this.radius * 0.67).outerRadius(this.radius - 1);
+      const arc = d3.arc().innerRadius(this.radius * 0.6).outerRadius(this.radius);
 
       const pie = d3.pie()
           .padAngle(0.005)
@@ -168,7 +171,7 @@ export default {
   },
   computed: {
     viewBox() {
-      return `0 0 ${this.width + this.margin.left + this.margin.right + this.margin.right} ${this.height + this.margin.top + this.margin.bottom}`
+      return `${(-this.width + this.margin.left + this.margin.right + this.margin.right)/2} ${-(this.height + this.margin.top + this.margin.bottom)/2} ${this.width + this.margin.left + this.margin.right + this.margin.right} ${this.height + this.margin.top + this.margin.bottom}`
     },
 
   },
@@ -176,6 +179,47 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
+<style scoped>
 /* Add your CSS here */
+.container {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 30px;
+  display: grid;
+  grid-template-rows: 10vh 10vh 10vh;
+  grid-template-columns: 1fr 7fr 1fr 1fr;
+  grid-template-areas:
+    ". title title ."
+    ". main bt1 bt1"
+    ". main bt2 bt2";
+}
+
+.pie-chart-main {
+  grid-area: main;
+  justify-self: stretch;
+}
+
+.button1 {
+  grid-area: bt1;
+  background: #ff926e;
+  border: #ff7b43;
+  border-radius: 10px;
+  height: 80px;
+}
+
+.button2 {
+  grid-area: bt2;
+  background: #ffcc9f;
+  border: lightsalmon;
+  border-radius: 10px;
+  height: 80px;
+}
+
+.title {
+  grid-area: title;
+}
+
 </style>
