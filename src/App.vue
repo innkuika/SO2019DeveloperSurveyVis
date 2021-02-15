@@ -29,7 +29,7 @@
         class="pie-chart"
         v-if="selectedData"
         chartId="SO-survey3"
-        title="See What's In People's Mind"
+        title="What's In People's Mind?"
         :dataset="selectedData"
         :width="400"
         :height="250"

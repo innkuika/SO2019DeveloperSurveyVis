@@ -2,13 +2,14 @@
 <template>
   <div>
     <h1>{{ title }}</h1>
-    <svg class="legends" height=45 width=600></svg>
     <svg :class="`world-map-svg-${chartId}`" :viewBox="viewBox">
       <g :transform="`translate(${margin.left}, ${margin.top})`">
         <g class="plot"></g>
       </g>
-
     </svg>
+    <p width=100>
+      See how much time people in different country spend on working per week on average.
+    </p>
   </div>
 </template>
 
@@ -52,9 +53,9 @@ export default {
       y: null,
       color: null,
       margin: {
-        left: 75,
-        top: 50,
-        right: 20,
+        left: 35,
+        top: 10,
+        right: 40,
         bottom: 75,
       }
     };

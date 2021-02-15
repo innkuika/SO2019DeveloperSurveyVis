@@ -137,16 +137,6 @@ export default {
 
       svg.selectAll("text").remove()
 
-
-      svg
-          .selectAll("path")
-          .data(arcs)
-          .join("path")
-          .attr("fill", d => this.color(d.data.name))
-          .attr("d", arc)
-          .append("title")
-          .text(d => `${d.data.name}: ${d.data.value.toLocaleString()}`);
-
       svg.append("g")
           .attr("font-family", "sans-serif")
           .attr("font-size", 12)
@@ -163,7 +153,21 @@ export default {
               .attr("x", 0)
               .attr("y", "0.7em")
               .attr("fill-opacity", 0.7)
-              .text(d => d.data.value.toLocaleString()));
+              .text(d => d.data.value.toLocaleString()))
+
+      svg
+          .selectAll("path")
+          .data(arcs)
+          .join("path")
+          .transition()
+          .duration(1000)
+          .attr("fill", d => this.color(d.data.name))
+          .attr("fill-opacity", "0.8")
+          .attr("d", arc)
+          .append("title")
+          .text(d => `${d.data.name}: ${d.data.value.toLocaleString()}`);
+
+
 
       return svg.node();
 
