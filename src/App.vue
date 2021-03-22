@@ -76,7 +76,7 @@ export default {
           betterLife: d["BetterLife"],
           itPerson: this.parseITPerson(d["ITperson"])
         }
-      }).filter((d, i) => i % 10 === 0 && d.age > 0 && d.age1stCode > 0 && d.yearsCode > 0 && d.age > d.age1stCode && d.age < 80)
+      }).filter((d, i) => i % 100 === 0 && d.age > 0 && d.age1stCode > 0 && d.yearsCode > 0 && d.age > d.age1stCode && d.age < 80)
     });
   },
   methods: {
